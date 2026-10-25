@@ -1,4 +1,4 @@
-# MediaSaver — Stage 1
+# MediaSaver
 
 An Android app (React Native + Expo SDK 58 + TypeScript) for downloading and managing
 video and audio files **from sources that permit it**.
@@ -24,6 +24,20 @@ video and audio files **from sources that permit it**.
 **Verified in the build environment:** TypeScript strict type-check passes, 45 automated tests pass,
 and the Android JavaScript bundle compiles (`expo export --platform android`).
 **Not yet verified:** running on a real phone — that's your first test (steps below).
+
+
+## Stage 2 (added)
+
+| Feature | Status |
+|---|---|
+| **Music tab**: search free songs cleared for commercial use (Openverse: Jamendo, Freesound, Wikimedia…) | Done · unit-tested + live API check in the GitHub build |
+| Preview a track before downloading | Written · needs on-device test |
+| Licence shown on every track; "Credit needed" vs "No credit needed" | Done · unit-tested |
+| **Copy credit** button on downloaded tracks that need attribution (paste into captions) | Written · needs on-device test |
+| **Import songs or videos from phone** (e.g. your own AI-composed songs) into the library | Done · naming logic unit-tested; picker needs on-device test |
+
+Music search uses Openverse's public API with no key. It always requests `license_type=commercial`,
+so results are safe for business reels; CC BY tracks require crediting the artist.
 
 ## Architecture
 
@@ -138,6 +152,5 @@ npm run typecheck    # TypeScript strict
 - No API keys or secrets in the app.
 
 ## Next stages (proposed)
-2. On-device QA fixes, download notifications, background downloads (dev build).
-3. Import your own files from the phone into the library; search and sort.
-4. More permitted sources (e.g. Wikimedia Commons), app icon and splash.
+3. Download notifications and background downloads; search and sort in the library.
+4. App icon, splash screen, and more permitted sources.

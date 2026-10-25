@@ -1,6 +1,7 @@
 /** One row in the Downloads library — shows status and the actions that fit it. */
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import * as Clipboard from 'expo-clipboard';
 import * as Sharing from 'expo-sharing';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import {
@@ -45,6 +46,12 @@ export function DownloadRow({ item }: { item: DownloadItem }) {
     }
   };
 
+  const copyCredit = async () => {
+    if (!item.attribution) return;
+    await Clipboard.setStringAsync(item.attribution).catch(() => false);
+    Alert.alert('Credit copied', 'Paste it into your reel or status caption.');
+  };
+
   const statusBadge = () => {
     switch (item.status) {
       case 'downloading':
@@ -81,6 +88,12 @@ export function DownloadRow({ item }: { item: DownloadItem }) {
             </Text>
             {statusBadge()}
           </View>
+          {item.licenseLabel ? (
+            <Text style={{ color: colors.textMuted, fontSize: 12 }}>
+              {item.licenseLabel}
+              {item.attribution ? ' · credit the artist when posting' : ' · no credit needed'}
+            </Text>
+          ) : null}
         </View>
       </View>
 
@@ -120,6 +133,9 @@ export function DownloadRow({ item }: { item: DownloadItem }) {
           <>
             <Button compact icon="play" label="Play" onPress={() => router.push(`/player/${item.id}`)} />
             <IconButton icon="share-social-outline" label="Share" onPress={share} />
+            {item.attribution ? (
+              <Button compact variant="secondary" icon="copy-outline" label="Copy credit" onPress={copyCredit} />
+            ) : null}
             <IconButton icon="folder-open-outline" label="Save to a folder on this phone" onPress={saveToDevice} />
             <IconButton icon="trash-outline" label="Delete" color={colors.danger} onPress={confirmDelete} />
           </>

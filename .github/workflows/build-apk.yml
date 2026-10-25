@@ -39,6 +39,12 @@ jobs:
           npx tsc --noEmit
           npx jest --ci
 
+      - name: Live check of the free-music API (Openverse)
+        continue-on-error: true
+        run: npx jest --ci __tests__/openverse.live.test.ts
+        env:
+          LIVE_API: 1
+
       - name: Generate the Android project (Expo prebuild)
         run: npx expo prebuild --platform android --no-install
         env:

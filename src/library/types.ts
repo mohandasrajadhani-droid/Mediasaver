@@ -25,4 +25,8 @@ export interface DownloadItem {
   completedAt?: number;
   /** True if the file was deleted outside the app. */
   missing?: boolean;
+  /** Licence name, e.g. "CC BY 4.0" (music search downloads). */
+  licenseLabel?: string;
+  /** Credit line to paste into a caption when the licence requires it. */
+  attribution?: string;
 }

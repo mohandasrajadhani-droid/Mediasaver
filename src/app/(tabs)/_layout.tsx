@@ -28,6 +28,14 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="music"
+        options={{
+          title: 'Free Music',
+          tabBarLabel: 'Music',
+          tabBarIcon: ({ color, size }) => <Ionicons name="musical-notes" color={color as string} size={size} />,
+        }}
+      />
+      <Tabs.Screen
         name="downloads"
         options={{
           title: 'Downloads',

@@ -33,6 +33,8 @@ export interface StartRequest {
   title: string;
   pageUrl: string;
   sourceName: string;
+  licenseLabel?: string;
+  attribution?: string;
 }
 
 export type StartResult =
@@ -94,6 +96,8 @@ export async function startDownload(req: StartRequest, opts: { allowDuplicate?: 
     bytesWritten: 0,
     totalBytes: req.option.sizeBytes ?? -1,
     createdAt: Date.now(),
+    licenseLabel: req.licenseLabel,
+    attribution: req.attribution,
   };
   add(item);
   run(item.id, 'start');

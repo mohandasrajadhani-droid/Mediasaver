@@ -2,8 +2,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { RefreshControl, SectionList, StyleSheet, Text, View } from 'react-native';
+import { Alert, RefreshControl, SectionList, StyleSheet, Text, View } from 'react-native';
 import { DownloadRow } from '../../components/DownloadRow';
+import { Button } from '../../components/ui';
+import { importFromPhone } from '../../library/importFiles';
 import { freeSpaceBytes } from '../../download/fileStore';
 import { isActive, refreshMissingFiles } from '../../download/downloadManager';
 import { useLibrary } from '../../library/store';
@@ -20,6 +22,22 @@ export default function DownloadsScreen() {
     refreshMissingFiles();
     setFree(freeSpaceBytes());
   }, []);
+
+  const [importing, setImporting] = useState(false);
+  const runImport = async () => {
+    setImporting(true);
+    try {
+      const r = await importFromPhone();
+      if (r.cancelled) return;
+      refresh();
+      const lines = [`${r.imported} file${r.imported === 1 ? '' : 's'} added to your library.`, ...r.skipped];
+      Alert.alert(r.imported > 0 ? 'Imported' : 'Nothing imported', lines.join('\n'));
+    } catch {
+      Alert.alert("Couldn't import", 'The file picker could not be opened. Please try again.');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   // Re-check files and free space each time the tab is opened.
   useFocusEffect(refresh);
@@ -49,11 +67,14 @@ export default function DownloadsScreen() {
         <Text style={[s.section, { color: colors.textMuted, backgroundColor: colors.bg }]}>{section.title}</Text>
       )}
       ListHeaderComponent={
-        <View style={[s.storage, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Ionicons name="server-outline" size={18} color={colors.textMuted} />
-          <Text style={{ color: colors.textMuted, fontSize: 13 }}>
-            Using {formatBytes(sections.usedBytes)} · {free == null ? '…' : formatBytes(free)} free on phone
-          </Text>
+        <View style={{ gap: 10 }}>
+          <Button variant="secondary" icon="add-circle-outline" label="Import songs or videos from phone" loading={importing} onPress={runImport} />
+          <View style={[s.storage, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="server-outline" size={18} color={colors.textMuted} />
+            <Text style={{ color: colors.textMuted, fontSize: 13 }}>
+              Using {formatBytes(sections.usedBytes)} · {free == null ? '…' : formatBytes(free)} free on phone
+            </Text>
+          </View>
         </View>
       }
       ListEmptyComponent={
