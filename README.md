@@ -99,6 +99,13 @@ npx expo start
 
 ## Build an installable APK
 
+**Automatic (GitHub):** every push to `main` builds the APK with GitHub Actions
+(`.github/workflows/build-apk.yml`). When it finishes (about 15–25 min), open the repo's
+**Releases** page on your phone and tap **MediaSaver.apk**. You can also start a build from the
+**Actions** tab → *Build Android APK* → *Run workflow*.
+
+**Manual (EAS cloud):**
+
 ```bash
 npm install -g eas-cli        # or use: npx eas-cli@latest
 eas login                     # free Expo account

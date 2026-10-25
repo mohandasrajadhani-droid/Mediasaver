@@ -1,0 +1,73 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install
+        run: npm ci
+
+      - name: Type-check and run tests
+        run: |
+          npx tsc --noEmit
+          npx jest --ci
+
+      - name: Generate the Android project (Expo prebuild)
+        run: npx expo prebuild --platform android --no-install
+        env:
+          CI: 1
+
+      # A release build includes the app's JavaScript, so the APK runs on its own
+      # (a debug build would need the computer's Expo server). Expo signs it with
+      # the standard debug key, which is fine for installing on your own phone.
+      - name: Build the APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Name the APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk MediaSaver.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MediaSaver-APK
+          path: MediaSaver.apk
+
+      - name: Publish as a release (download the .apk straight to the phone)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: MediaSaver (build ${{ github.run_number }})
+          body: |
+            Open this page on your Android phone and tap **MediaSaver.apk** to download and install.
+            Built from commit ${{ github.sha }}.
+          files: MediaSaver.apk
+          make_latest: true
